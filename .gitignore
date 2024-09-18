@@ -1,0 +1,4 @@
+.idea
+.env
+venv
+vue-project/node_modules
