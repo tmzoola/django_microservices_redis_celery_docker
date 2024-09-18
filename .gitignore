@@ -2,3 +2,4 @@
 .env
 venv
 vue-project/node_modules
+users/.env

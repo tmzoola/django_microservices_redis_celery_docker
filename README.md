@@ -89,3 +89,9 @@ This project is a Dockerized microservices setup that includes a Django backend,
    git clone <your-repository-url>
    cd <your-repository-directory>
 
+
+2. **Build and Start Containers**
+
+   ```bash
+   docker-compose build
+   docker-compose up 
