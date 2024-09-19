@@ -5,6 +5,13 @@ x-environment-defaults: &environment-defaults
   DB_HOST: "postgres"
   DB_PORT: 5432
 
+x-second-environment: &second-environment
+  DB_NAME: "second_backend"
+  DB_USER: "second_backend"
+  DB_PASSWORD: "second_backend"
+  DB_HOST: "second_postgres"
+  DB_PORT: 5432
+
 services:
   postgres:
     image: postgres:latest
@@ -18,6 +25,33 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
+  second_postgres:
+    image: postgres:latest
+    container_name: second_postgres
+    environment:
+      POSTGRES_DB: second_backend
+      POSTGRES_USER: second_backend
+      POSTGRES_PASSWORD: second_backend
+    ports:
+      - "5433:5432"
+    volumes:
+      - second_pg_data:/var/lib/postgresql/data
+
+  backend-second:
+    build:
+      context: ./mailhub
+    ports:
+      - "8002:8000"
+
+    depends_on:
+      - second_postgres
+    environment:
+      <<: *second-environment
+    volumes:
+      - second_static_volume:/app/static
+      - ./mailhub:/app
+
+
   backend:
     build:
       context: ./users
@@ -29,9 +63,10 @@ services:
       <<: *environment-defaults
     volumes:
       - static_volume:/app/static
+      - ./users:/app
     restart: on-failure:5
     healthcheck:
-      test: curl -f http://localhost:8000/api/healthcheck || exit 1
+      test: curl -f http://localhost:8000/users/healthcheck || exit 1
       interval: 10s
       timeout: 10s
       retries: 3
@@ -46,6 +81,7 @@ services:
       - "80:80"
     depends_on:
       - backend
+      - backend-second
 
   frontend:
     build:
@@ -91,4 +127,6 @@ services:
 volumes:
   pg_data:
   static_volume:
+  second_pg_data:
+  second_static_volume:
 
