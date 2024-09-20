@@ -3,3 +3,6 @@
 venv
 vue-project/node_modules
 users/.env
+users/static
+users/staticfiles
+mailhub/staticfiles
